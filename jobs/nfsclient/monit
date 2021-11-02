@@ -1,0 +1,6 @@
+<% if properties.nfs_server.address %>
+check file nfsclient path /etc/cron.d/nfsclient
+  start program "/var/vcap/jobs/nfsclient/bin/ctl install"
+  stop program "/var/vcap/jobs/nfsclient/bin/ctl unmount"
+  group vcap
+<% end %>

@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+#
+set -e # exit immediately if a simple command exits with a non-zero status
+
+# Load job properties
+source /var/vcap/jobs/nfsclient/data/properties.sh
+
+# Setup env vars and folders for the ctl script
+source /var/vcap/jobs/nfsclient/packages/nfsclient/bosh-helpers-nfs/setup.sh "nfsclient"
+
+# Load function lib (alway before setup, there are some global variables needed)
+source /var/vcap/jobs/nfsclient/packages/nfsclient/bosh-helpers-nfs/lib.sh
+
+MOUNTPOINT=<%= p('nfs_server.share_path') %>
+<%- if_p("nfs_server.nfsv4") %>
+VERSION=nfs4
+SHARE='<%= p("nfs_server.address") %>:<%= p("nfs_server.share", "/") %>'
+<%- else %>
+VERSION=nfs
+SHARE='<%= p("nfs_server.address") %>:<%= p("nfs_server.share", "/var/vcap/store") %>'
+<%- end %>
+
+case ${1:-help} in
+  install)
+    cp  ${JOB_DIR}/data/crontab /etc/cron.d/nfsclient
+    chmod 0644 /etc/cron.d/nfsclient
+    mount_nfs "${SHARE}" "${MOUNTPOINT}" ${VERSION}
+    ;;
+  mount)
+    if pidof -o %PPID -x "$(basename $0)" >/dev/null
+    then
+      echo "Process already running"
+    else
+      mount_nfs "${SHARE}" "${MOUNTPOINT}" ${VERSION}
+    fi
+    ;;
+  unmount)
+    rm -f /etc/cron.d/nfsclient
+    unmount_nfs "${MOUNTPOINT}"
+    ;;
+  *)
+    echo "Usage: $0 {install|mount|umount}"
+    ;;
+esac
+exit 0

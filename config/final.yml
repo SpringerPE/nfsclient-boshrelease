@@ -1,0 +1,6 @@
+---
+name: nfsclient
+blobstore:
+  provider: local
+  options:
+    blobstore_path: blobstore

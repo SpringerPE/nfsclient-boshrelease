@@ -1,0 +1,43 @@
+---
+name: nfsclient
+
+description: "The NFS Mounter sets up an NFS mount at a specific location. It can be used with the Cloud Controller to save assets to the NFS Server."
+# "The NFS Mounter does not use BPM. Having this job use bpm would be very difficult and provide little value."
+
+templates:
+  bin/ctl.erb: bin/ctl
+  bin/pre-start.erb: bin/pre-start
+  data/properties.sh.erb: data/properties.sh
+  data/crontab: data/crontab
+  config/idmapd.conf.erb: config/idmapd.conf
+  config/nfs-common: config/nfs-common
+
+packages:
+- bosh-helpers-nfs
+
+properties:
+  nfs_server.address:
+    description: "NFS server address"
+  nfs_server.share:
+    description: "Path to share from the remote NFS server"
+  nfs_server.nfsv4:
+    description: "Enable NFS4"
+  nfs_server.idmapd_domain:
+    description: "Domain name for NFS idmapd"
+    default: "localdomain"
+  nfs_server.pipefs_directory:
+    description: "Pipefs directory for NFS idmapd"
+    default: "/var/lib/nfs/rpc_pipefs"
+  nfs_server.share_path:
+    description: "Location to mount the nfs share"
+    default: "/var/vcap/data/nfs"
+
+  nfs_server.apt_packages:
+    description: "List of packages to be installed"
+    default:
+      rpcbind: "*"
+      keyutils: "*"
+      nfs-common: "*"
+  nfs_server.apt_get_update:
+    description: "Perform apt-get update before install packages"
+    default: true

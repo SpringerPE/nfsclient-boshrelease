@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+#
+set -e # exit immediately if a simple command exits with a non-zero status
+
+# Load job properties
+source /var/vcap/jobs/nfsclient/data/properties.sh
+
+# Setup env vars and folders for the ctl script
+source /var/vcap/jobs/nfsclient/packages/nfsclient/bosh-helpers-nfs/setup.sh "nfsclient"
+
+# Load function lib (alway before setup, there are some global variables needed)
+source /var/vcap/jobs/nfsclient/packages/nfsclient/bosh-helpers-nfs/lib.sh
+
+
+LSB_RELEASE=$(lsb_release -c | awk '{print $2}')
+if [ "${LSB_RELEASE}" == "xenial" ] || [ "${LSB_RELEASE}" == "bionic" ]
+then
+<%- if p("nfs_server.apt_get_update") == true || p("nfs_server.apt_get_update") =~ (/(true|t|yes|y|1)$/i) %>
+    echo "Running apt-get update ..."
+    apt-get update
+<%- end %>
+    echo "Installing NFS packages ..."
+<%- p("nfs_server.apt_packages").each do |package, version| %>
+    <% if version == nil || version == '' || version == '*' %>
+    apt-get install  --no-install-recommends -y  <%= package %>
+    <% else %>
+    apt-get install  --no-install-recommends -y  <%= package %>='<%= version %>'
+    apt-mark hold <%= package %>
+    <% end %>
+<%- end %>
+else
+    echo "Bosh release nfsclient does not support ${LSB_RELEASE}"
+    exit 1
+fi
