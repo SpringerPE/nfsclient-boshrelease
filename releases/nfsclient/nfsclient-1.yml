@@ -1,0 +1,21 @@
+name: nfsclient
+version: "1"
+commit_hash: e5a12e1
+uncommitted_changes: false
+jobs:
+- name: nfsclient
+  version: 79d16603489ad0587fc3480a5248157f4be290df89d819427648b121e7586fac
+  fingerprint: 79d16603489ad0587fc3480a5248157f4be290df89d819427648b121e7586fac
+  sha1: sha256:5489f915404f3aee86db0f7f3e742b0ff76ed905ca6e1f62eabd4a53c0fa094d
+  packages:
+  - bosh-helpers-nfs
+packages:
+- name: bosh-helpers-nfs
+  version: 86572b991776ef9f9bdbd912d85da3770047e6ed3634e5ac63f914e28624f942
+  fingerprint: 86572b991776ef9f9bdbd912d85da3770047e6ed3634e5ac63f914e28624f942
+  sha1: sha256:9341397c8a785e3ae0b26adab58c941abb55a075b0d528a048194d2b4f8c597c
+  dependencies: []
+license:
+  version: b94bcce1aa53c3b00b139b690e9d3a6e9900cbfcf2a33350d3e2f1593dcb07d3
+  fingerprint: b94bcce1aa53c3b00b139b690e9d3a6e9900cbfcf2a33350d3e2f1593dcb07d3
+  sha1: sha256:09d9791e6a8f32260c9fa65d4d455550044567a166411b39c2de7b1147bc654c
