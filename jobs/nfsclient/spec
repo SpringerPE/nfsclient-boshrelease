@@ -33,7 +33,11 @@ properties:
     default: "/var/vcap/data/nfs"
 
   nfs_server.apt_packages:
-    description: "List of packages to be installed"
+    description: |
+      List of packages (ordered) to be installed. Each item is a map of at least one package and the version. 
+      Version can be * or empty to install the latest version. Otherwise, it can be a string like "0.2", if such
+      strings matches a version in the distro, that one will be installed, otherwise it will install the latest minor
+      version available (eg 0.2.10, having also 0.2.9 available). Also when using version, packages will be marked for hold
     default:
     - rpcbind: "*"
     - keyutils: "*"

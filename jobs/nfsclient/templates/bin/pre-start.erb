@@ -12,6 +12,31 @@ source /var/vcap/jobs/nfsclient/packages/bosh-helpers-nfs/setup.sh "nfsclient"
 source /var/vcap/jobs/nfsclient/packages/bosh-helpers-nfs/lib.sh
 
 
+function get_dpkg_package_version {
+    local pkgname="$1"
+    local minversion="$2"
+    local finalversion="0"
+
+    for version in $(apt-cache madison "${pkgname}" | awk -F'|' '{print $2}')
+    do
+        if dpkg --compare-versions "${version}" eq "${minversion}" 2>/dev/null
+        then
+            finalversion=${version}
+            break
+        elif dpkg --compare-versions "${version}" ge "${minversion}" 2>/dev/null
+        then
+            if dpkg --compare-versions "${version}" gt "${finalversion}" 2>/dev/null
+            then
+                finalversion=${version}
+            fi
+        fi
+    done
+    [ "${finalversion}" == "0" ] && return 1
+    echo "${finalversion}"
+    return 0
+}
+
+
 LSB_RELEASE=$(lsb_release -c | awk '{print $2}')
 if [ "${LSB_RELEASE}" == "xenial" ] || [ "${LSB_RELEASE}" == "bionic" ]
 then
@@ -25,8 +50,15 @@ then
     <% if version == nil || version == '' || version == '*' %>
     apt-get install  --no-install-recommends -y  <%= package %>
     <% else %>
-    apt-get install  --no-install-recommends -y  <%= package %>='<%= version %>'
-    apt-mark hold <%= package %>
+    if version=$(get_dpkg_package_version "<%= package %>" "<%= version %>")
+    then
+        apt-mark unhold '<%= package %>'
+        apt-get install --no-install-recommends --allow-downgrades --yes  <%= package %>="${version}"
+        apt-mark hold '<%= package %>'
+    else
+        echo "APT package <%= package %> version equal or bigger than '<%= version %>' not found in ${LSB_RELEASE}"
+        exit 1
+    fi
     <% end %>
     <% end %>
 <% end %>
