@@ -78,8 +78,15 @@ esac
 
 # Get the last git commit made by this script
 lastcommit=$(git log --format="%h" --grep="$RELEASE v*" | head -1)
-echo "* Changes since last version with commit $lastcommit: "
-git_changes=$(git log --pretty="%h %aI %s (%an)" $lastcommit..@ | sed 's/^/- /')
+if [ -z "$lastcommit" ]
+then
+    echo "* Changes since beginning"
+    git_changes=$(git log --pretty="%h %aI %s (%an)" | sed 's/^/- /')
+    version=1
+else
+    echo "* Changes since last version with commit $lastcommit: "
+    git_changes=$(git log --pretty="%h %aI %s (%an)" $lastcommit..@ | sed 's/^/- /')
+fi
 if [ -z "$git_changes" ]
 then
     echo "Error, no commits since last release with commit $lastcommit!. Please "
