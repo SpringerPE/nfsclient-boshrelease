@@ -5,6 +5,94 @@ of shipping Debian packages with the release (which breaks the philosophy of a l
 
 For now it is focused on Ubuntu stemcells.
 
+## Usage
+
+The parameters are compatible with the `nfs_mounter` job of bosh `capi-release`.
+It also creates the `shared` folder and the file `<mountpoint>/shared/.nfs_test` to check if it is
+writable (the file is used in other releases -like CAPI- for checking everything is ok).
+
+Given this manifest:
+
+```
+---
+name: nfs-test
+
+releases:
+- name: nfsclient
+  version: latest
+
+stemcells:
+- alias: xenial
+  os: ubuntu-xenial
+  version: latest
+- alias: bionic
+  os: ubuntu-bionic
+  version: latest
+
+instance_groups:
+- name: bionic
+  instances: 1
+  vm_type: small
+  stemcell: bionic
+  vm_extensions: []
+  azs:
+  - z1
+  - z2
+  - z3
+  networks:
+  - name: default
+  jobs:
+  - name: nfsclient
+    release: nfsclient
+    properties:
+      nfs_server:
+        address: "10.10.0.1"
+        share: "/blobstore"
+        share_path: '/var/vcap/data/nfs'
+        nfsv4: false
+        apt_packages:
+        - rpcbind: "0.2.3-0.6"
+        - keyutils: "*"
+        - nfs-common: "1:1.3"
+
+- name: xenial
+  instances: 1
+  vm_type: small
+  stemcell: xenial
+  vm_extensions: []
+  azs:
+  - z1
+  - z2
+  - z3
+  networks:
+  - name: default
+  jobs:
+  - name: nfsclient
+    release: nfsclient
+    properties:
+      nfs_server:
+        address: "10.10.0.1"
+        share: "/blobstore"
+        share_path: '/var/vcap/data/nfs'
+        nfsv4: false
+        
+update:
+  canaries: 1
+  max_in_flight: 1
+  serial: false
+  canary_watch_time: 1000-60000
+  update_watch_time: 1000-60000
+```
+
+Two vms will be created. The first one is using a ubuntu-bionic stemcell and the versions of the packages are specificed.
+The version of `rpcbind` matches a version so that one will be installed. In the case of `nfs-common` the version does not
+match a full version, but it matches with mayor versions (like `1:1.3.4-2.1ubuntu5.3` `1:1.3.4-2.1ubuntu5.5` and `1:1.3.4-2.1ubuntu5`)
+so the latest one (bigger) will be installed (`1:1.3.4-2.1ubuntu5.5`). Also both packages will will be marked for hold, so no
+updates will be installed even if they are available.
+
+The xenial one (second instance) will have the nfs packages installed with the latest available version in the distribution
+(after doing `apt-get update` -by default-).
+
 
 # Developing
 
