@@ -35,9 +35,9 @@ properties:
   nfs_server.apt_packages:
     description: "List of packages to be installed"
     default:
-      rpcbind: "*"
-      keyutils: "*"
-      nfs-common: "*"
+    - rpcbind: "*"
+    - keyutils: "*"
+    - nfs-common: "*"
   nfs_server.apt_get_update:
     description: "Perform apt-get update before install packages"
     default: true
