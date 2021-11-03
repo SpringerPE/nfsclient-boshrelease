@@ -6,7 +6,7 @@ set -e
 ##
 
 RELEASE="nfsclient"
-DESCRIPTION="Bosh release to add nfsclient pacakges from distribution and setup a mountpoint"
+DESCRIPTION="Bosh release to add nfsclient packages from distribution and setup a nfs mountpoint"
 GITHUB_REPO="SpringerPE/nfsclient-boshrelease"
 
 ###
@@ -157,7 +157,7 @@ echo -n "  URL: "
 $CURL -H "Authorization: token $GITHUB_TOKEN" -H "Content-Type: application/octet-stream" --data-binary @"/tmp/$RELEASE-$$.tgz" "https://uploads.github.com/repos/$GITHUB_REPO/releases/$releaseid/assets?name=$RELEASE.tgz" | $JQ -r '.browser_download_url'
 
 # Delete the release
-rm -f "/tmp/$RELEASE-$$.tgz"
+# rm -f "/tmp/$RELEASE-$$.tgz"
 
 echo
 echo "*** Description https://github.com/$GITHUB_REPO/releases/tag/v$version: "

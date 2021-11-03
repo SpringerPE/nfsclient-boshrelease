@@ -1,7 +1,7 @@
 name: nfsclient
 version: "1"
-commit_hash: e5a12e1
-uncommitted_changes: false
+commit_hash: 897e98b
+uncommitted_changes: true
 jobs:
 - name: nfsclient
   version: 79d16603489ad0587fc3480a5248157f4be290df89d819427648b121e7586fac

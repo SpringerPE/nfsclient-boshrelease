@@ -1,5 +1,4 @@
----
-name: nfsclient
+name: nfsclient-boshrelease
 blobstore:
   provider: local
   options:
