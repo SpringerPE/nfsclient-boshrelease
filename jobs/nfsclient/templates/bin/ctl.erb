@@ -6,19 +6,19 @@ set -e # exit immediately if a simple command exits with a non-zero status
 source /var/vcap/jobs/nfsclient/data/properties.sh
 
 # Setup env vars and folders for the ctl script
-source /var/vcap/jobs/nfsclient/packages/nfsclient/bosh-helpers-nfs/setup.sh "nfsclient"
+source /var/vcap/jobs/nfsclient/packages/bosh-helpers-nfs/setup.sh "nfsclient"
 
 # Load function lib (alway before setup, there are some global variables needed)
-source /var/vcap/jobs/nfsclient/packages/nfsclient/bosh-helpers-nfs/lib.sh
+source /var/vcap/jobs/nfsclient/packages/bosh-helpers-nfs/lib.sh
 
 MOUNTPOINT=<%= p('nfs_server.share_path') %>
-<%- if_p("nfs_server.nfsv4") %>
+<% if p("nfs_server.nfsv4") == true || p("nfs_server.nfsv4") =~ (/(true|t|yes|y|1)$/i) %>
 VERSION=nfs4
 SHARE='<%= p("nfs_server.address") %>:<%= p("nfs_server.share", "/") %>'
-<%- else %>
+<% else %>
 VERSION=nfs
 SHARE='<%= p("nfs_server.address") %>:<%= p("nfs_server.share", "/var/vcap/store") %>'
-<%- end %>
+<% end %>
 
 case ${1:-help} in
   install)
