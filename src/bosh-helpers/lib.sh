@@ -162,7 +162,7 @@ function mount_nfs {
     cp -f /etc/default/nfs-common /etc/default/nfs-common.orig
     cp -f "${JOB_DIR}/config/nfs-common" /etc/default/nfs-common
     cp -f "${JOB_DIR}/config/idmapd.conf" /etc/idmapd.conf
-    service idmapd restart
+    service idmapd restart || true
     unmount_nfs "${mountpoint}"
 
     echo "Mounting NFS ${nfsvolune} at ${mountpoint} ..."
