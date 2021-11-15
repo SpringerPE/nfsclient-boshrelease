@@ -19,7 +19,7 @@ SHA1="sha1sum -b"
 RE_VERSION_NUMBER='^[0-9]+([0-9\.]*[0-9]+)*$'
 
 # Create a personal github token to use this script
-if [ -z "$GITHUB_TOKEN" ] || [ -z "$GITHUB_USER" ] 
+if [ -z "$GITHUB_TOKEN" ] || [ -z "$GITHUB_USER" ]
 then
     echo "GITHUB_USER and/or GITHUB_TOKEN environment variables not defined!"
     echo "See https://help.github.com/articles/creating-an-access-token-for-command-line-use/"
@@ -115,6 +115,7 @@ fi
 echo "* Commiting git changes ..."
 git add .final_builds releases/$RELEASE/index.yml "releases/$RELEASE/$RELEASE-$version.yml" blobstore
 git commit -m "$RELEASE v$version Boshrelease"
+git tag -a "v$version" -m "$RELEASE v$version Boshrelease"
 git push
 git push --tags
 
