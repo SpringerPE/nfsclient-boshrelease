@@ -157,7 +157,7 @@ echo -n "  URL: "
 $CURL -u "$GITHUB_USER:$GITHUB_TOKEN" -H "Content-Type: application/octet-stream" --data-binary @"/tmp/$RELEASE-$$.tgz" "https://uploads.github.com/repos/$GITHUB_REPO/releases/$releaseid/assets?name=$RELEASE.tgz" | $JQ -r '.browser_download_url'
 
 # Delete the release
-# rm -f "/tmp/$RELEASE-$$.tgz"
+rm -f "/tmp/$RELEASE-$$.tgz"
 
 echo
 echo "*** Description https://github.com/$GITHUB_REPO/releases/tag/v$version: "
