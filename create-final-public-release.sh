@@ -19,9 +19,9 @@ SHA1="sha1sum -b"
 RE_VERSION_NUMBER='^[0-9]+([0-9\.]*[0-9]+)*$'
 
 # Create a personal github token to use this script
-if [ -z "$GITHUB_TOKEN" ]
+if [ -z "$GITHUB_TOKEN" ] || [ -z "$GITHUB_USER" ] 
 then
-    echo "Github TOKEN not defined!"
+    echo "GITHUB_USER and/or GITHUB_TOKEN environment variables not defined!"
     echo "See https://help.github.com/articles/creating-an-access-token-for-command-line-use/"
     exit 1
 fi
@@ -149,12 +149,12 @@ or to always point to latest release:
 EOF
 )
 printf -v DATA '{"tag_name": "v%s","target_commitish": "master","name": "v%s","body": %s,"draft": false, "prerelease": false}' "$version" "$version" "$(echo "$description" | $JQ -R -s '@text')"
-releaseid=$($CURL -H "Authorization: token $GITHUB_TOKEN" -H "Content-Type: application/json" -XPOST --data "$DATA" "https://api.github.com/repos/$GITHUB_REPO/releases" | $JQ '.id')
+releaseid=$($CURL -u "$GITHUB_USER:$GITHUB_TOKEN" -H "Content-Type: application/json" -XPOST --data "$DATA" "https://api.github.com/repos/$GITHUB_REPO/releases" | $JQ '.id')
 
 # Upload the release
 echo "* Uploading tarball to Github releases section ... "
 echo -n "  URL: "
-$CURL -H "Authorization: token $GITHUB_TOKEN" -H "Content-Type: application/octet-stream" --data-binary @"/tmp/$RELEASE-$$.tgz" "https://uploads.github.com/repos/$GITHUB_REPO/releases/$releaseid/assets?name=$RELEASE.tgz" | $JQ -r '.browser_download_url'
+$CURL -u "$GITHUB_USER:$GITHUB_TOKEN" -H "Content-Type: application/octet-stream" --data-binary @"/tmp/$RELEASE-$$.tgz" "https://uploads.github.com/repos/$GITHUB_REPO/releases/$releaseid/assets?name=$RELEASE.tgz" | $JQ -r '.browser_download_url'
 
 # Delete the release
 # rm -f "/tmp/$RELEASE-$$.tgz"
