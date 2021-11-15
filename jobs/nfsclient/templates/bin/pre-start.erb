@@ -40,6 +40,7 @@ function get_dpkg_package_version {
 LSB_RELEASE=$(lsb_release -c | awk '{print $2}')
 if [ "${LSB_RELEASE}" == "xenial" ] || [ "${LSB_RELEASE}" == "bionic" ]
 then
+    export DEBIAN_FRONTEND=noninteractive
 <% if p("nfs_server.apt_get_update") == true || p("nfs_server.apt_get_update") =~ (/(true|t|yes|y|1)$/i) %>
     echo "Running apt-get update ..."
     apt-get update
@@ -48,12 +49,12 @@ then
 <% p("nfs_server.apt_packages", []).each do |aptp| %>
     <% aptp.each do |package, version| %>
     <% if version == nil || version == '' || version == '*' %>
-    apt-get install  --no-install-recommends -y  <%= package %>
+    apt-get install -o Dpkg::Options::="--force-confold" --no-install-recommends --allow-change-held-packages --yes <%= package %>
     <% else %>
     if version=$(get_dpkg_package_version "<%= package %>" "<%= version %>")
     then
         apt-mark unhold '<%= package %>'
-        apt-get install --no-install-recommends --allow-downgrades --yes  <%= package %>="${version}"
+        apt-get install -o Dpkg::Options::="--force-confold" --no-install-recommends --allow-downgrades --yes  <%= package %>="${version}"
         apt-mark hold '<%= package %>'
     else
         echo "APT package <%= package %> version equal or bigger than '<%= version %>' not found in ${LSB_RELEASE}"
